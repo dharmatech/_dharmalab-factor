@@ -36,9 +36,8 @@ IN: with-slots
   [let | CLASS  [ scan-word        ]
          OBJECT [ "OBJECT" <local> ] |
 
-    [let | LET-VARS [ { { "OBJECT" OBJECT } }        ]
-           SLOTS    [ CLASS all-slots [ name>> ] map ] |
-
+    [let | LET-VARS [ { { "OBJECT" OBJECT } } ] |
+      
       [
 
         in-lambda? on
@@ -47,18 +46,20 @@ IN: with-slots
 
         ! process wlet
 
-        [let | READER-BINDINGS [ SLOTS [ OBJECT make-reader-binding ] map ]
-               WRITER-BINDINGS [ SLOTS [ OBJECT make-writer-binding ] map ] |
+        [let | SLOTS [ CLASS all-slots [ name>> ] map ] |
+          
+          [let | READER-BINDINGS [ SLOTS [ OBJECT make-reader-binding ] map ]
+                 WRITER-BINDINGS [ SLOTS [ OBJECT make-writer-binding ] map ] |
+            
+            [let | WLET-BINDINGS [ READER-BINDINGS WRITER-BINDINGS append ] |
 
-          [let | WLET-BINDINGS [ READER-BINDINGS WRITER-BINDINGS append ] |
+              [let | WLET-VARS [ WLET-BINDINGS bindings->vars ] |
 
-            [let | WLET-VARS [ WLET-BINDINGS bindings->vars ] |
-
-              [let | WLET-BODY [ WLET-VARS \ ] (parse-lambda) ] |
+                [let | WLET-BODY [ WLET-VARS \ ] (parse-lambda) ] |
               
-                [let | WLET [ WLET-BINDINGS WLET-BODY <wlet> ] |
+                  [let | WLET [ WLET-BINDINGS WLET-BODY <wlet> ] |
 
-                  100 <vector> WLET parsed-lambda >quotation ] ] ] ] ]
+                    100 <vector> WLET parsed-lambda >quotation ] ] ] ] ] ]
 
         ! end process wlet
 
@@ -74,4 +75,3 @@ IN: with-slots
         [let | LET [ LET-BINDINGS LET-BODY <let> ] |
 
           ACCUM LET parsed-lambda ] ] ] ] ; parsing
-
