@@ -14,7 +14,7 @@ IN: git-remote-tool
 
 TUPLE: <git-remote-gadget> < pack
   repository
-  branch
+  
   remote
   remote-branch
   fetch-period
@@ -74,38 +74,9 @@ TUPLE: <git-remote-gadget> < pack
     <label>
     suffix
 
-    ! Branch button
-    
-    <shelf>
+    ! Branch label
 
-      "Branch: " <label> add-gadget
-
-      REPO current-branch
-      [
-        drop
-        
-        <pile>
-          REPO list-branches
-
-          [| BRANCH |
-
-            BRANCH
-            [
-              drop
-              REPO { "git" "checkout" BRANCH } git-process popup-if-error
-              GADGET refresh-git-remote-gadget
-            ]
-            <bevel-button> add-gadget
-
-          ]
-          each
-
-        "Select a branch" open-window
-        
-      ]
-      <bevel-button> add-gadget
-
-    suffix
+    "Branch: " REPO current-branch append <label> suffix
 
     ! Remote button
 
