@@ -1,8 +1,8 @@
 
-USING: accessors git-tool io.directories io.pathnames kernel
-locals namespaces sequences ui ui.gadgets ui.gadgets.buttons
-ui.gadgets.editors ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.tracks ;
+USING: accessors git-tool io.directories io.monitors
+io.pathnames kernel locals math namespaces sequences system
+threads ui ui.gadgets ui.gadgets.buttons ui.gadgets.editors
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.tracks ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -28,9 +28,6 @@ TUPLE: <git-status-gadget> < pack
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 M: <git-status-gadget> pref-dim* ( gadget -- dim ) drop { 500 500 } ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
