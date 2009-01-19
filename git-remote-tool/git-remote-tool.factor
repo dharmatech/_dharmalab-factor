@@ -275,6 +275,12 @@ TUPLE: <git-remote-gadget> < pack
 
         ] ] ]
 
+    ! Rrefresh button
+
+    "Refresh" [ drop GADGET refresh-git-remote-gadget ] <bevel-button> suffix
+
+    ! Add the child gadgets
+
     GADGET clear-gadget
 
     GADGET swap
