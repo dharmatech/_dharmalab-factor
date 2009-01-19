@@ -21,7 +21,20 @@ TUPLE: <git-status-gadget> < pack
   deleted
   untracked
 
-  closed ;
+  closed
+  
+  last-refresh ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: <git-status-gadget> pref-dim* ( gadget -- dim ) drop { 500 500 } ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M:: <git-status-gadget> ungraft* ( GADGET -- ) GADGET t >>closed drop ;
   
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -217,6 +230,51 @@ TUPLE: <git-status-gadget> < pack
   "Refresh" [ drop GADGET refresh-git-status-gadget ] <bevel-button> add-gadget
 
   drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: start-monitor-thread ( GADGET -- )
+
+  GADGET f >>closed drop
+
+  [
+    [
+      [let | MONITOR [ GADGET repository>> t <monitor> ] |
+        
+        [
+          GADGET closed>>
+          [ f ]
+          [
+            [let | PATH [ MONITOR next-change drop ] |
+
+              ".git" PATH subseq?
+              [ ]
+              [
+                micros GADGET last-refresh>> 0 or -
+                1000000 >
+                [
+                  GADGET micros >>last-refresh drop
+                  GADGET refresh-git-status-gadget
+                ]
+                when
+              ]
+              if ]
+
+            t
+
+          ]
+          if
+        ]
+        loop
+      ]
+    ]
+    with-monitors
+  ]
+  in-thread ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M:: <git-status-gadget> graft* ( GADGET -- ) GADGET start-monitor-thread ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
