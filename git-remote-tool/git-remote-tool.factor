@@ -17,8 +17,9 @@ TUPLE: <git-remote-gadget> < pack
   
   remote
   remote-branch
+
   fetch-period
-  push
+
   closed
   last-refresh ;
 
