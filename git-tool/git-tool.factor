@@ -637,6 +637,48 @@ TUPLE: <git-remotes-gadget> < pack repository closed last-refresh ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! :: start-remotes-monitor-thread ( GADGET -- )
+
+!   GADGET f >>closed drop
+
+!   [
+!     [
+!       [let | MONITOR [ GADGET repository>> t <monitor> ] |
+        
+!         [
+!           GADGET closed>>
+!             [ f ]
+!             [
+!               [let | PATH [ MONITOR next-change drop ] |
+
+!                 micros  GADGET last-refresh>> 0 or  -    1000000 >
+!                   [
+
+!                     GADGET micros >>last-refresh drop
+
+!                     ! "FETCH_HEAD"     PATH subseq?
+!                     ! "COMMIT_EDITMSG" PATH subseq? or
+
+!                     "COMMIT_EDITMSG" PATH subseq?
+!                       [ GADGET refresh-git-remotes-gadget ]
+!                     when
+
+!                   ]
+!                 when ]
+!               t
+!             ]
+!           if
+!         ]
+!         loop
+        
+!       ]
+!     ]
+!     with-monitors
+!   ]
+!   in-thread ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 :: start-remotes-monitor-thread ( GADGET -- )
 
   GADGET f >>closed drop
@@ -651,20 +693,13 @@ TUPLE: <git-remotes-gadget> < pack repository closed last-refresh ;
             [
               [let | PATH [ MONITOR next-change drop ] |
 
-                micros  GADGET last-refresh>> 0 or  -    1000000 >
-                  [
+                GADGET micros >>last-refresh drop
 
-                    GADGET micros >>last-refresh drop
+                "COMMIT_EDITMSG" PATH subseq?
+                  [ GADGET refresh-git-remotes-gadget ]
+                when
 
-                    ! "FETCH_HEAD"     PATH subseq?
-                    ! "COMMIT_EDITMSG" PATH subseq? or
-
-                    "COMMIT_EDITMSG" PATH subseq?
-                      [ GADGET refresh-git-remotes-gadget ]
-                    when
-
-                  ]
-                when ]
+                ]
               t
             ]
           if
