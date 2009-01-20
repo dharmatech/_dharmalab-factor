@@ -410,17 +410,7 @@ M:: <git-status-gadget> graft* ( GADGET -- ) GADGET start-monitor-thread ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: <git-remote-track> < track
-
-  repository
-  
-  remote
-  remote-branch
-
-  fetch-period
-
-  closed
-  last-refresh ;
+TUPLE: <git-remote-track> < track repository remote remote-branch ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -602,8 +592,6 @@ TUPLE: <git-remote-track> < track
     "origin" >>remote
 
     "master" >>remote-branch
-
-    5 minutes >>fetch-period
 
     dup refresh-git-remote-track ;
 
