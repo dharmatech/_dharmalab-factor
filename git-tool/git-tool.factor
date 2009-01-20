@@ -745,29 +745,31 @@ M: <git-tool> pref-dim* ( gadget -- dim ) drop { 600 500 } ;
 
 :: git-tool ( REPO -- )
 
-  <git-tool> new-gadget
+  [let | REPO [ REPO [ current-directory get ] with-directory ] |
+
+    <git-tool> new-gadget
 
     { 0 1 } >>orientation
 
     1 >>fill
 
-  { 1 0 } <track>
+    { 1 0 } <track>
     "Repository: " <label> 1/5 track-add
     REPO [ current-directory get ] with-directory <label> 1 track-add
-  add-gadget
+    add-gadget
 
-  { 1 0 } <track>
+    { 1 0 } <track>
     "Branch: " <label> 1/5 track-add
     REPO current-branch <label> 1 track-add
-  add-gadget
-  
-  REPO git-status-gadget add-gadget
+    add-gadget
+    
+    REPO git-status-gadget add-gadget
 
-  dup "git-tool" open-window
+    dup "git-tool" open-window
 
-  REPO git-remotes-gadget add-gadget
+    REPO git-remotes-gadget add-gadget
 
-  drop ;
+    drop ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
