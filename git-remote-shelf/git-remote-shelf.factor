@@ -1,13 +1,13 @@
 
-USING: accessors calendar git-remote-tool git-tool kernel
+USING: accessors calendar git-remote-tool git-misc kernel
 locals sequences ui ui.gadgets ui.gadgets.buttons
-ui.gadgets.packs ;
+ui.gadgets.packs ui.gadgets.labels ;
 
 IN: git-remote-shelf
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: <git-remote-shelf> < pack
+TUPLE: <git-remote-shelf> < track
 
   repository
   
@@ -26,6 +26,8 @@ TUPLE: <git-remote-shelf> < pack
   [let | REPO [ GADGET repository>> ] |
 
     GADGET clear-gadget
+
+    GADGET sizes>> delete-all
 
     GADGET
 
@@ -56,7 +58,7 @@ TUPLE: <git-remote-shelf> < pack
       "Select a remote" open-window
       
     ]
-    <bevel-button> add-gadget
+    <bevel-button> 1/5 track-add
 
     ! Remote branch button
 
@@ -74,7 +76,7 @@ TUPLE: <git-remote-shelf> < pack
         [
           drop
           GADGET REMOTE-BRANCH >>remote-branch drop
-          GADGET refresh-git-remote-gadget
+          GADGET refresh-git-remote-shelf
         ]
         <bevel-button> add-gadget
       ]
@@ -84,7 +86,7 @@ TUPLE: <git-remote-shelf> < pack
       "Select a remote branch" open-window
 
     ]
-    <bevel-button> add-gadget
+    <bevel-button> 1/5 track-add
 
     ! Fetch button
 
@@ -94,9 +96,9 @@ TUPLE: <git-remote-shelf> < pack
       [let | REMOTE [ GADGET remote>> ] |
         REPO { "git" "fetch" REMOTE } git-process popup-if-error ]
       
-      GADGET refresh-git-remote-gadget
+      GADGET refresh-git-remote-shelf
     ]
-    <bevel-button> add-gadget
+    <bevel-button> 1/5 track-add
 
     ! Available changes
 
@@ -112,7 +114,7 @@ TUPLE: <git-remote-shelf> < pack
 
               "Mergable"
               [ drop PROCESS popup-process-window ]
-              <bevel-button> add-gadget
+              <bevel-button> 1/5 track-add
 
               "Merge"
               [
@@ -124,13 +126,19 @@ TUPLE: <git-remote-shelf> < pack
 
                 ]
 
-                GADGET refresh-git-remote-gadget
+                GADGET refresh-git-remote-shelf
 
               ]
-              <bevel-button> add-gadget
+              <bevel-button> 1/5 track-add
 
             ]
-          when ] ] ]
+            [
+              "" <label> 1/5 track-add
+              "" <label> 1/5 track-add
+            ]
+          if
+
+        ] ] ]
 
     ! Pushable changes
 
@@ -145,7 +153,7 @@ TUPLE: <git-remote-shelf> < pack
             [
                 "Pushable"
                 [ drop PROCESS popup-process-window ]
-                <bevel-button> add-gadget
+                <bevel-button> 1/5 track-add
 
                 "Push"
                 [
@@ -158,10 +166,16 @@ TUPLE: <git-remote-shelf> < pack
                   GADGET refresh-git-remote-shelf
 
                 ]
-                <bevel-button> add-gadget
+                <bevel-button> 1/5 track-add
 
             ]
-          when ] ] ]
+            [
+              "" <label> 1/5 track-add
+              "" <label> 1/5 track-add
+            ]
+          if
+          
+        ] ] ]
 
     drop ] ;
 
@@ -169,7 +183,7 @@ TUPLE: <git-remote-shelf> < pack
 
 :: git-remote-shelf ( REPO -- gadget )
 
-  <git-remote-shelf> new-gadget
+  <git-remote-shelf> new init-track
 
   { 1 0 } >>orientation
 
