@@ -697,7 +697,14 @@ TUPLE: <git-remotes-gadget> < pack repository closed last-refresh ;
 !                   [ GADGET refresh-git-remotes-gadget ]
 !                 when
 
-                PATH ".git/refs/heads/master" tail?
+!                 PATH ".git/refs/heads/master" tail?
+!                   [ GADGET refresh-git-remotes-gadget ]
+!                 when
+
+                {
+                  [ ".git" PATH subseq? ]
+                  [ PATH "master" tail? ]
+                } 0&&
                   [ GADGET refresh-git-remotes-gadget ]
                 when
                 
