@@ -693,9 +693,14 @@ TUPLE: <git-remotes-gadget> < pack repository closed last-refresh ;
             [
               [let | PATH [ MONITOR next-change drop ] |
 
-                "COMMIT_EDITMSG" PATH subseq?
+!                 "COMMIT_EDITMSG" PATH subseq?
+!                   [ GADGET refresh-git-remotes-gadget ]
+!                 when
+
+                PATH ".git/refs/heads/master" tail?
                   [ GADGET refresh-git-remotes-gadget ]
                 when
+                
 
                 ]
               t
