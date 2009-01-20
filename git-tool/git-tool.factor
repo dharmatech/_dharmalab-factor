@@ -718,7 +718,7 @@ M: <git-tool> pref-dim* ( gadget -- dim ) drop { 600 500 } ;
 
   dup "git-tool" open-window
 
-  REPO git-remotes-gadget add-gadget
+  REPO git-remotes-gadget dup start-remotes-monitor-thread add-gadget
 
   drop ;
 
