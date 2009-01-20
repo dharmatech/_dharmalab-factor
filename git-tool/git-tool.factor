@@ -607,23 +607,25 @@ TUPLE: <git-remotes-gadget> < pack repository closed last-refresh ;
 
   <git-remotes-gadget> new-gadget
 
-  { 0 1 } >>orientation
+    { 0 1 } >>orientation
 
-  1 >>fill
+    1 >>fill
 
-  "Remotes" <label> reverse-video-theme add-gadget
+    REPO >>repository
 
-  REPO list-remotes
+    "Remotes" <label> reverse-video-theme add-gadget
 
-    [| REMOTE |
+    REPO list-remotes
 
-      REPO git-remote-track
-        REMOTE >>remote
-        dup refresh-git-remote-track
-      add-gadget
+      [| REMOTE |
 
-    ]
-  each ;
+        REPO git-remote-track
+          REMOTE >>remote
+          dup refresh-git-remote-track
+        add-gadget
+
+      ]
+    each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
