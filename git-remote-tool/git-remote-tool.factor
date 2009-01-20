@@ -1,10 +1,8 @@
 
-USING: accessors calendar git-tool io.directories
+USING: accessors calendar io.directories
 io.monitors io.pathnames kernel locals math namespaces
 sequences splitting system threads ui ui.gadgets
-ui.gadgets.buttons ui.gadgets.labels ui.gadgets.packs ;
-
-USING: git-tool ;
+ui.gadgets.buttons ui.gadgets.labels ui.gadgets.packs git-misc ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
