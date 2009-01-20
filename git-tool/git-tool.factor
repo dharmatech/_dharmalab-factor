@@ -689,7 +689,6 @@ M: <git-remotes-gadget> ungraft* ( gadget -- ) t >>closed drop              ;
 TUPLE: <git-tool> < pack ;
 
 
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 M: <git-tool> pref-dim* ( gadget -- dim ) drop { 600 500 } ;
