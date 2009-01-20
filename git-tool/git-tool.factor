@@ -629,6 +629,8 @@ M: <git-tool> pref-dim* ( gadget -- dim ) drop { 600 500 } ;
   
   REPO git-status-gadget add-gadget
 
+  dup "git-tool" open-window
+
   "Remotes" <label> reverse-video-theme add-gadget
 
   REPO list-remotes
@@ -642,7 +644,7 @@ M: <git-tool> pref-dim* ( gadget -- dim ) drop { 600 500 } ;
     ]
   each
 
-  "git-tool" open-window ;
+  drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
