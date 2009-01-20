@@ -611,9 +611,9 @@ M: <git-tool> pref-dim* ( gadget -- dim ) drop { 600 500 } ;
 
   <git-tool> new-gadget
 
-  { 0 1 } >>orientation
+    { 0 1 } >>orientation
 
-  1 >>fill
+    1 >>fill
 
   { 1 0 } <track>
     "Repository: " <label> 1/5 track-add
