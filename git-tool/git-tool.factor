@@ -599,9 +599,7 @@ TUPLE: <git-remote-track> < track repository remote remote-branch ;
 ! git-tool
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: <git-tool> < pack
-
-  ;
+TUPLE: <git-tool> < pack ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
