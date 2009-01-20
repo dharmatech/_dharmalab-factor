@@ -596,6 +596,91 @@ TUPLE: <git-remote-track> < track repository remote remote-branch ;
     dup refresh-git-remote-track ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! <git-remotes-gadget>
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+TUPLE: <git-remotes-gadget> < pack repository closed last-refresh ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: git-remotes-gadget ( REPO -- gadget )
+
+  <git-remotes-gadget> new-gadget
+
+  { 0 1 } >>orientation
+
+  1 >>fill
+
+  "Remotes" <label> reverse-video-theme add-gadget
+
+  REPO list-remotes
+
+    [| REMOTE |
+
+      REPO git-remote-track
+        REMOTE >>remote
+        dup refresh-git-remote-track
+      add-gadget
+
+    ]
+  each ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: refresh-git-remotes-gadget ( GADGET -- )
+  
+  GADGET children>> [ <git-remote-track>? ] filter
+    [ refresh-git-remote-track ]
+  each ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: start-remotes-monitor-thread ( GADGET -- )
+
+  GADGET f >>closed drop
+
+  [
+    [
+      [let | MONITOR [ GADGET repository>> t <monitor> ] |
+        
+        [
+          GADGET closed>>
+            [ f ]
+            [
+              [let | PATH [ MONITOR next-change drop ] |
+
+                micros  GADGET last-refresh>> 0 or  -    1000000 >
+                  [
+
+                    GADGET micros >>last-refresh drop
+
+                    ! "FETCH_HEAD"     PATH subseq?
+                    ! "COMMIT_EDITMSG" PATH subseq? or
+
+                    "COMMIT_EDITMSG" PATH subseq?
+                      [ GADGET refresh-git-remotes-gadget ]
+                    when
+
+                  ]
+                when ]
+              t
+            ]
+          if
+        ]
+        loop
+        
+      ]
+    ]
+    with-monitors
+  ]
+  in-thread ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: <git-remotes-gadget> graft*   ( gadget -- ) start-remotes-monitor-thread ;
+M: <git-remotes-gadget> ungraft* ( gadget -- ) t >>closed drop              ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! git-tool
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -629,18 +714,7 @@ M: <git-tool> pref-dim* ( gadget -- dim ) drop { 600 500 } ;
 
   dup "git-tool" open-window
 
-  "Remotes" <label> reverse-video-theme add-gadget
-
-  REPO list-remotes
-    [| REMOTE |
-
-      REPO git-remote-track
-        REMOTE >>remote
-        dup refresh-git-remote-track
-      add-gadget
-
-    ]
-  each
+  REPO git-remotes-gadget add-gadget
 
   drop ;
 
