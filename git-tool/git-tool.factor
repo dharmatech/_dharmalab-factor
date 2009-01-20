@@ -694,7 +694,7 @@ TUPLE: <git-remotes-gadget> < pack repository closed last-refresh ;
               [let | PATH [ MONITOR next-change drop ] |
 
                 "COMMIT_EDITMSG" PATH subseq?
-                  [ GADGET refresh-git-remotes-gadget ]
+                  [ 1 seconds sleep GADGET refresh-git-remotes-gadget ]
                 when
 
                 ]
