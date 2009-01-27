@@ -5,9 +5,11 @@ fry io io.directories io.encodings io.encodings.utf8
 io.launcher io.monitors io.pathnames io.pipes io.ports kernel
 locals math namespaces sequences splitting strings system
 threads ui ui.gadgets ui.gadgets.buttons ui.gadgets.editors
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.tracks ;
+ui.gadgets.labels ui.gadgets.packs ui.gadgets.scrollers
+ui.gadgets.tracks ;
 
 IN: git-tool
+
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -61,15 +63,41 @@ IN: git-tool
   dup string? [ ] [ "\n" join ] if
   <editor> tuck set-editor-string swap open-window ;
 
-: popup-process-window ( process -- )
-  [ stdout>> [ "output" swap popup-window ] when* ]
-  [ stderr>> [ "error"  swap popup-window ] when* ]
-  [
-    [ stdout>> ] [ stderr>> ] bi or not
-    [ "Process" "NO OUTPUT" popup-window ]
-    when
-  ]
-  tri ;
+! : popup-process-window ( process -- )
+!   [ stdout>> [ "output" swap popup-window ] when* ]
+!   [ stderr>> [ "error"  swap popup-window ] when* ]
+!   [
+!     [ stdout>> ] [ stderr>> ] bi or not
+!     [ "Process" "NO OUTPUT" popup-window ]
+!     when
+!   ]
+!   tri ;
+
+:: popup-process-window ( PROCESS -- )
+
+  [let | STDOUT-EDITOR [ <editor> ]
+         STDERR-EDITOR [ <editor> ] |
+
+    { 0 1 } <track>
+
+      PROCESS stdout>>
+        [
+          "stdout" <label> reverse-video-theme f track-add
+          STDOUT-EDITOR <scroller> 1/2 track-add
+        ]
+      when
+
+      PROCESS stderr>>
+        [
+          "stderr" <label> reverse-video-theme f track-add
+          STDERR-EDITOR <scroller> 1/2 track-add
+        ]
+      when
+
+    "process output" open-window
+
+    PROCESS stdout>> "\n" join   STDOUT-EDITOR   set-editor-string
+    PROCESS stderr>> "\n" join   STDERR-EDITOR   set-editor-string ] ;
 
 : popup-if-error ( process -- )
   { [ status>> 0 = not ] [ popup-process-window t ] } 1&& drop ;
@@ -391,23 +419,36 @@ M:: <git-status-gadget> graft* ( GADGET -- ) GADGET start-monitor-thread ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! :: list-remote-branches ( REPO REMOTE -- branches )
+!   [let | OUT [ REPO { "git" "remote" "show" REMOTE } git-process stdout>> ] |
+
+!     "  Tracked remote branches" OUT member?
+!       [
+!         OUT
+!         "  Tracked remote branches" OUT index 1 + tail first " " split
+!         [ empty? not ] filter
+!       ]
+!       [
+!         OUT
+!         OUT [ "  New remote branches" head? ] find drop
+!         1 + tail first " " split
+!         [ empty? not ] filter
+!       ]
+!     if ] ;
+
+! Other git versions list all branches on one line
+
+! 1.6.1 lists them on separate lines
+
 :: list-remote-branches ( REPO REMOTE -- branches )
-  [let | OUT [ REPO { "git" "remote" "show" REMOTE } git-process stdout>> ] |
-
-    "  Tracked remote branches" OUT member?
-      [
-        OUT
-        "  Tracked remote branches" OUT index 1 + tail first " " split
-        [ empty? not ] filter
-      ]
-      [
-        OUT
-        OUT [ "  New remote branches" head? ] find drop
-        1 + tail first " " split
-        [ empty? not ] filter
-      ]
-    if ] ;
-
+  
+  REPO { "git" "ls-remote" REMOTE } git-process
+  stdout>>
+  [ empty? not ] filter
+  [ "\t" split second ] map
+  [ "HEAD" = not ] filter
+  [ "refs/heads/" ?head drop ] map ;
+   
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: <git-remote-track> < track repository remote remote-branch ;
