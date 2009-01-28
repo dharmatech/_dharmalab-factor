@@ -59,9 +59,9 @@ IN: git-tool
 ! process popup windows
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: popup-window ( title contents -- )
-  dup string? [ ] [ "\n" join ] if
-  <editor> tuck set-editor-string swap open-window ;
+! : popup-window ( title contents -- )
+!   dup string? [ ] [ "\n" join ] if
+!   <editor> tuck set-editor-string swap open-window ;
 
 ! : popup-process-window ( process -- )
 !   [ stdout>> [ "output" swap popup-window ] when* ]
@@ -73,12 +73,47 @@ IN: git-tool
 !   ]
 !   tri ;
 
-:: popup-process-window ( PROCESS -- )
+! :: popup-process-window ( PROCESS -- )
+
+!   [let | STDOUT-EDITOR [ <editor> ]
+!          STDERR-EDITOR [ <editor> ] |
+
+!     { 0 1 } <track>
+
+!       PROCESS stdout>>
+!         [
+!           "stdout" <label> reverse-video-theme f track-add
+!           STDOUT-EDITOR <scroller> 1/2 track-add
+!         ]
+!       when
+
+!       PROCESS stderr>>
+!         [
+!           "stderr" <label> reverse-video-theme f track-add
+!           STDERR-EDITOR <scroller> 1/2 track-add
+!         ]
+!       when
+
+!     "process output" open-window
+
+!     PROCESS stdout>> "\n" join   STDOUT-EDITOR   set-editor-string
+!     PROCESS stderr>> "\n" join   STDERR-EDITOR   set-editor-string ] ;
+
+! : popup-if-error ( process -- )
+!   { [ status>> 0 = not ] [ popup-process-window t ] } 1&& drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+TUPLE: <process-gadget> < track ;
+
+M: <process-gadget> pref-dim* ( gadget -- dim ) drop { 400 400 } ;
+
+:: process-gadget ( PROCESS -- gadget )
+
+  <process-gadget> new init-track { 0 1 } >>orientation 1 >>fill
 
   [let | STDOUT-EDITOR [ <editor> ]
          STDERR-EDITOR [ <editor> ] |
-
-    { 0 1 } <track>
 
       PROCESS stdout>>
         [
@@ -94,13 +129,15 @@ IN: git-tool
         ]
       when
 
-    "process output" open-window
-
     PROCESS stdout>> "\n" join   STDOUT-EDITOR   set-editor-string
     PROCESS stderr>> "\n" join   STDERR-EDITOR   set-editor-string ] ;
 
+: process-window ( process -- ) process-gadget "process output" open-window ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : popup-if-error ( process -- )
-  { [ status>> 0 = not ] [ popup-process-window t ] } 1&& drop ;
+  { [ status>> 0 = not ] [ process-window t ] } 1&& drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -298,7 +335,7 @@ M:: <git-status-gadget> ungraft* ( GADGET -- ) GADGET t >>closed drop ;
         [
           drop
           GADGET repository>> { "git" "diff" PATH } git-process
-          popup-process-window
+          process-window
         ]
         <bevel-button> add-gadget
 
@@ -552,7 +589,7 @@ TUPLE: <git-remote-track> < track repository remote remote-branch ;
             [
 
               "Mergable"
-              [ drop PROCESS popup-process-window ]
+              [ drop PROCESS process-window ]
               <bevel-button> 1/6 track-add
 
               "Merge"
@@ -561,7 +598,7 @@ TUPLE: <git-remote-track> < track repository remote remote-branch ;
 
                 [let | ARG [ { REMOTE "/" REMOTE-BRANCH } concat ] |
 
-                  REPO { "git" "merge" ARG } git-process popup-process-window
+                  REPO { "git" "merge" ARG } git-process process-window
 
                 ]
 
@@ -591,7 +628,7 @@ TUPLE: <git-remote-track> < track repository remote remote-branch ;
           PROCESS stdout>>
             [
                 "Pushable"
-                [ drop PROCESS popup-process-window ]
+                [ drop PROCESS process-window ]
                 <bevel-button> 1/6 track-add
 
                 "Push"
@@ -600,7 +637,7 @@ TUPLE: <git-remote-track> < track repository remote remote-branch ;
 
                   REPO { "git" "push" REMOTE REMOTE-BRANCH }
                   git-process
-                  popup-process-window
+                  process-window
 
                   GADGET refresh-git-remote-track
 
